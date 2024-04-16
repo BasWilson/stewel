@@ -34,7 +34,7 @@ type Instance struct {
 }
 
 var instance Instance
-var lbIndexes = make(map[string]int)
+var lbIndexes map[string]int
 
 func handleConnection(req *http.Request) {
 	hostHeader := req.Host
@@ -75,11 +75,11 @@ func handleConnection(req *http.Request) {
 
 }
 
-func Create(config Config) error {
+func Create(addr string, config Config) error {
 	Apply(config)
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{})
 	proxy.Director = handleConnection
-	err := http.ListenAndServe(":1337", proxy)
+	err := http.ListenAndServe(addr, proxy)
 	return err
 }
 

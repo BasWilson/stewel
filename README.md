@@ -1,71 +1,39 @@
-# What does it do
+## Stewel Reverse Proxy 🥾
 
-Checks if the host's public IP has changed from the last time it was checked. If it changes, it will update A records in a Cloudflare zone to point to the new IP.
+Dead simple reverse proxy based on [httputil.ReverseProxy](https://golang.org/pkg/net/http/httputil/#ReverseProxy).
 
-Useful for dynamic IPs. You can run it on a machine that has a dynamic IP and it will keep the DNS records updated.
+Just set a list of hosts and targets and you're good to go.
 
-## How to use
+Host is the domain you want to proxy, targets are the servers you want to proxy to.
 
-Compile it with `compile` or `compile_linux` if you are building it for a linux machine from a different OS.
+Example usage:
 
-```bash
-make compile
-```
-
-You can either just run the binary without any input, this will start an http server on port 1338 and will listen for requests on `/` with a POST method.
-
-Or you can run the binary with a path to a json file that contains the records you want to check and update.
-
-Both the body of the request and the json file should have the following format:
-
-```json
-{
-    "records": [
+```go
+config := reverse_proxy.Config{
+    Hosts: []reverse_proxy.Host{
         {
-            "name": "test.domain.com",
-            "addr": "127.0.0.1"
+            Host: "yourhost.com",
+            Targets: []reverse_proxy.Target{
+                "http://localhost:4000",
+                "http://localhost:4001",
+            },
+            LoadBalancer: reverse_proxy.LoadBalancer{
+                Method: reverse_proxy.RoundRobin,
+            },
         },
         {
-            "name": "test2.domain.com"
-        }
-    ]
+            Host: "anotherhost.com",
+            Targets: []reverse_proxy.Target{
+                "http://192.168.178.20:4000",
+            },
+            LoadBalancer: reverse_proxy.LoadBalancer{
+                Method: reverse_proxy.RoundRobin,
+            },
+        },
+    },
 }
+
+reverse_proxy.Create(":80", config)
 ```
 
-If you provide an `addr` field, it will work with that IP. If you don't provide it, it will use the public IP of the host.
-
-### Example
-
-With a json file called `records.json`:
-
-```bash
-./bin/twinner records.json
-```
-
-#### With a request:
-
-Start the server:
-
-```bash
-./bin/twinner
-```
-
-Send a request:
-
-```bash
-curl -X POST -d '{"records":[{"name":"test.domain.com","addr":"127.0.0.1"},{"name":"test2.domain.com"}]}' "http://localhost:1338"
-```
-
-If you provide a file, it will check if the IP changed every minute. If you run the binary without input, it will only check when you send a request.
-
-You can change the JSON file while the server is running and it will pick up the changes on the next iteration.
-
-The HTTP server does not start if you provide a file.
-
-## Environment variables
-
-```bash
-CLOUDFLARE_ZONE_ID=your-zone-id
-CLOUDFLARE_API_TOKEN=your-api-token
-AUTH_HEADER=your-auth-header-value
-```
+This will create a reverse proxy that listens on port 80 and proxies requests to `yourhost.com` to `localhost:4000` and `localhost:4001` in a round robin fashion.

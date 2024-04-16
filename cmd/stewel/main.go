@@ -26,5 +26,5 @@ func main() {
 		},
 	}
 
-	reverse_proxy.Create(config)
+	reverse_proxy.Create(":80", config)
 }
