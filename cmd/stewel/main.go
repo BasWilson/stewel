@@ -1,30 +1,37 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
+
 	reverse_proxy "github.com/baswilson/adraptor/tools/updater/lib"
-	"github.com/joho/godotenv"
 )
 
-func main() {
-	err := godotenv.Load()
+func handleLocalFile(jsonFile string) reverse_proxy.Config {
+	file, err := os.Open(jsonFile)
 	if err != nil {
-		println("Skipping .env file")
+		panic(err.Error())
+	}
+	defer file.Close()
+
+	var config reverse_proxy.Config
+	err = json.NewDecoder(file).Decode(&config)
+	if err != nil {
+		panic(err.Error())
 	}
 
-	config := reverse_proxy.Config{
-		Hosts: []reverse_proxy.Host{
-			{
-				Host: "shadow.adraptor.network",
-				Targets: []reverse_proxy.Target{
-					"http://localhost:4000",
-					"http://localhost:4001",
-				},
-				LoadBalancer: reverse_proxy.LoadBalancer{
-					Method: reverse_proxy.RoundRobin,
-				},
-			},
-		},
+	return config
+}
+
+func main() {
+
+	configPath := "./stewel-config.json"
+
+	if len(os.Args) == 2 {
+		configPath = os.Args[1]
 	}
+
+	config := handleLocalFile(configPath)
 
 	reverse_proxy.Create(":80", config)
 }

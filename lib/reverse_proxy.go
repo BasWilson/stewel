@@ -87,5 +87,6 @@ func Apply(config Config) {
 	instance = Instance{
 		Config: config,
 	}
+	fmt.Println(config)
 	lbIndexes = make(map[string]int)
 }

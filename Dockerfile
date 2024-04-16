@@ -25,7 +25,5 @@ WORKDIR /app
 # Copy the built executable from the builder stage to the /app directory in the final stage
 COPY --from=builder /app/bin/stewel .
 
-EXPOSE 1338
-
 # Command to run the executable
-CMD ["./stewel"]
+CMD ["./stewel", "stewel-config.json"]
