@@ -34,6 +34,7 @@ type Instance struct {
 }
 
 var instance Instance
+var lbIndexes = make(map[string]int)
 
 func handleConnection(req *http.Request) {
 	hostHeader := req.Host
@@ -41,7 +42,6 @@ func handleConnection(req *http.Request) {
 	var foundHost Host
 
 	for _, host := range instance.Config.Hosts {
-		println("Comparing", host.Host, hostHeader)
 		if host.Host == hostHeader {
 			foundHost = host
 			break
@@ -49,7 +49,16 @@ func handleConnection(req *http.Request) {
 	}
 
 	if foundHost.Host != "" {
-		target, err := url.Parse(string(foundHost.Targets[0]))
+		lbIndex := lbIndexes[foundHost.Host]
+		target, err := url.Parse(string(foundHost.Targets[lbIndex]))
+
+		if foundHost.LoadBalancer.Method == RoundRobin {
+			if len(foundHost.Targets)-1 == lbIndex {
+				lbIndexes[foundHost.Host] = 0
+			} else {
+				lbIndexes[foundHost.Host] = lbIndex + 1
+			}
+		}
 
 		if err != nil {
 			req.Response.StatusCode = http.StatusBadGateway
@@ -67,14 +76,16 @@ func handleConnection(req *http.Request) {
 }
 
 func Create(config Config) error {
-
-	instance = Instance{
-		Config: config,
-	}
-
+	Apply(config)
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{})
 	proxy.Director = handleConnection
 	err := http.ListenAndServe(":1337", proxy)
-
 	return err
+}
+
+func Apply(config Config) {
+	instance = Instance{
+		Config: config,
+	}
+	lbIndexes = make(map[string]int)
 }

@@ -14,9 +14,10 @@ func main() {
 	config := reverse_proxy.Config{
 		Hosts: []reverse_proxy.Host{
 			{
-				Host: "stewel.adraptor.network",
+				Host: "shadow.adraptor.network",
 				Targets: []reverse_proxy.Target{
 					"http://localhost:4000",
+					"http://localhost:4001",
 				},
 				LoadBalancer: reverse_proxy.LoadBalancer{
 					Method: reverse_proxy.RoundRobin,
