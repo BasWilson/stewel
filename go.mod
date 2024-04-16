@@ -1,3 +1,3 @@
-module github.com/baswilson/adraptor/tools/updater
+module github.com/baswilson/stewel
 
-go 1.20
+go 1.21

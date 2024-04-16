@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	reverse_proxy "github.com/baswilson/adraptor/tools/updater/lib"
+	reverse_proxy "github.com/baswilson/stewel/lib"
 )
 
 func handleLocalFile(jsonFile string) reverse_proxy.Config {
