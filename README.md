@@ -52,7 +52,7 @@ Sample Dockerfile usage:
 
 ```bash
 docker build -t yourtag .
-docker run -p 80:80 --network=host -v /path/to/stewel-config.json:/app/stewel-config.yaml yourtag
+docker run -p 80:80 --network=host -v /path/to/stewel-config.json:/app/stewel-config.json yourtag
 ```
 
 ### Todo
