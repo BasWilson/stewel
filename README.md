@@ -26,9 +26,6 @@ config := reverse_proxy.Config{
             Targets: []reverse_proxy.Target{
                 "http://192.168.178.20:4000",
             },
-            LoadBalancer: reverse_proxy.LoadBalancer{
-                Method: reverse_proxy.RoundRobin,
-            },
         },
     },
 }
