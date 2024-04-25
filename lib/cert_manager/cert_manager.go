@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"net"
 	"os"
@@ -13,7 +14,20 @@ import (
 )
 var CACHE_DIR = "./stewel_cache"
 
+func ensureDirExists(dirPath string) error {
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// Create the directory with 0755 permissions
+		err := os.MkdirAll(dirPath, 0755)
+		if err != nil {
+			return fmt.Errorf("failed to create directory %s: %w", dirPath, err)
+		}
+	}
+	return nil
+}
+
 func Genv2(domain string) (certFile, keyFile string) {
+
+	ensureDirExists(CACHE_DIR)
 
 	// Generate private key
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
