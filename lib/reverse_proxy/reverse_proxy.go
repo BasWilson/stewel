@@ -97,7 +97,7 @@ func CreateTLS(config Config) error {
 		email = "support@stewel.xyz"
 	}
 
-	certFile, keyFile := cert_manager.Generate(email, config.Hosts[0].Host, string(config.Hosts[0].Targets[0]))
+	certFile, keyFile := cert_manager.Genv2(config.Hosts[0].Host)
 
 	err := http.ListenAndServeTLS(":443", certFile, keyFile, proxy)
 	return err
