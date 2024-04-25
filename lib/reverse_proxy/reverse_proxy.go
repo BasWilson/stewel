@@ -5,9 +5,12 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/baswilson/stewel/lib/cert_manager"
 )
 
 type Config struct {
+	Email string`json:"email"`
 	Hosts []Host `json:"hosts" validate:"required"`
 }
 
@@ -65,7 +68,7 @@ func handleConnection(req *http.Request) {
 		}
 
 		fmt.Println("proxied to target: ", target)
-		req.Header.Set("X-stewelVersion", "1")
+		req.Header.Set("X-StewelVersion", "1")
 
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
@@ -79,7 +82,24 @@ func Create(addr string, config Config) error {
 	Apply(config)
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{})
 	proxy.Director = handleConnection
+
 	err := http.ListenAndServe(addr, proxy)
+	return err
+}
+
+func CreateTLS(config Config) error {
+	Apply(config)
+	proxy := httputil.NewSingleHostReverseProxy(&url.URL{})
+	proxy.Director = handleConnection
+
+	email := config.Email
+	if email == "" {
+		email = "support@stewel.xyz"
+	}
+
+	certFile, keyFile := cert_manager.Genv2(config.Hosts[0].Host)
+
+	err := http.ListenAndServeTLS(":443", certFile, keyFile, proxy)
 	return err
 }
 

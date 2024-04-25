@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	reverse_proxy "github.com/baswilson/stewel/lib"
+	reverse_proxy "github.com/baswilson/stewel/lib/reverse_proxy"
 )
 
 func handleLocalFile(jsonFile string) reverse_proxy.Config {
@@ -33,5 +33,5 @@ func main() {
 
 	config := handleLocalFile(configPath)
 
-	reverse_proxy.Create(":80", config)
+	reverse_proxy.CreateTLS(config)
 }

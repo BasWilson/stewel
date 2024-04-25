@@ -24,3 +24,5 @@ bin/
 shadow-config.json
 
 .DS_Store
+
+stewel_cache/

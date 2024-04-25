@@ -1,11 +1,8 @@
 {
     "hosts": [
         {
-            "host": "yourhost.com",
-            "targets": [
-                "http://localhost:4000",
-                "http://localhost:4001"
-            ],
+            "host": "shadow.adraptor.network",
+            "targets": ["http://localhost:4000"],
             "loadBalancer": {
                 "method": "round-robin"
             }
